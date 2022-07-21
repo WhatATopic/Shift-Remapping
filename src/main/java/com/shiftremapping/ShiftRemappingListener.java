@@ -25,7 +25,6 @@
  */
 package com.shiftremapping;
 
-import com.google.common.base.Strings;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,7 +128,8 @@ class ShiftRemappingListener implements KeyListener
 					break;
 				case KeyEvent.VK_BACK_SPACE:
 					// Only lock chat on backspace when the typed text is now empty
-					if (Strings.isNullOrEmpty(client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT)))
+					if (client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT) == null ||
+							client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT).isEmpty())
 					{
 						plugin.setTyping(false);
 						clientThread.invoke(plugin::lockChat);
