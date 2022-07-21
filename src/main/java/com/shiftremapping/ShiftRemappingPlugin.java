@@ -124,7 +124,7 @@ public class ShiftRemappingPlugin extends Plugin
 		Widget worldMapSearch = client.getWidget(WidgetInfo.WORLD_MAP_SEARCH);
 		return worldMapSearch == null || client.getVarcIntValue(VarClientInt.WORLD_MAP_SEARCH_FOCUSED) != 1;
 	}
-	
+
 	boolean isDialogOpen()
 	{
 		// Most chat dialogs with numerical input are added without the chatbox or its key listener being removed,
