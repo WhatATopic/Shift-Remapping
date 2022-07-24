@@ -51,8 +51,7 @@ import net.runelite.client.util.ColorUtil;
 @PluginDescriptor(
 	name = "Shift Remapping",
 	description = "Allows remapping of shift key since it never got added to key remapping.",
-	tags = {"shift", "key", "remapping", "remap", "bind"},
-	enabledByDefault = false
+	tags = {"shift", "key", "remapping", "remap", "bind"}
 )
 public class ShiftRemappingPlugin extends Plugin
 {
