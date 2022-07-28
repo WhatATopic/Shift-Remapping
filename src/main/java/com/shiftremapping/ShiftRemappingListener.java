@@ -71,7 +71,7 @@ class ShiftRemappingListener implements KeyListener
 			return;
 		}
 
-		if (!plugin.isTyping())
+		if (!plugin.isTyping() || !config.enterToChat())
 		{
 			int mappedKeyCode = KeyEvent.VK_UNDEFINED;
 
@@ -100,12 +100,14 @@ class ShiftRemappingListener implements KeyListener
 				case KeyEvent.VK_ENTER:
 				case KeyEvent.VK_SLASH:
 				case KeyEvent.VK_COLON:
-					// refocus chatbox
-					plugin.setTyping(true);
-					clientThread.invoke(plugin::unlockChat);
-					break;
+					if (!plugin.isTyping())
+					{
+						// refocus chatbox
+						plugin.setTyping(true);
+						clientThread.invoke(plugin::unlockChat);
+						break;
+					}
 			}
-
 		}
 		else
 		{
@@ -114,25 +116,34 @@ class ShiftRemappingListener implements KeyListener
 				case KeyEvent.VK_ESCAPE:
 					// When exiting typing mode, block the escape key
 					// so that it doesn't trigger the in-game hotkeys
-					e.consume();
-					plugin.setTyping(false);
-					clientThread.invoke(() ->
+					if (config.enterToChat())
 					{
-						client.setVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT, "");
-						plugin.lockChat();
-					});
+						e.consume();
+						plugin.setTyping(false);
+						clientThread.invoke(() ->
+						{
+							client.setVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT, "");
+							plugin.lockChat();
+						});
+					}
 					break;
 				case KeyEvent.VK_ENTER:
-					plugin.setTyping(false);
-					clientThread.invoke(plugin::lockChat);
-					break;
-				case KeyEvent.VK_BACK_SPACE:
-					// Only lock chat on backspace when the typed text is now empty
-					if (client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT) == null ||
-							client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT).isEmpty())
+					if (config.enterToChat())
 					{
 						plugin.setTyping(false);
 						clientThread.invoke(plugin::lockChat);
+					}
+					break;
+				case KeyEvent.VK_BACK_SPACE:
+					if (config.enterToChat())
+					{
+						// Only lock chat on backspace when the typed text is now empty
+						if (client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT) == null ||
+								client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT).isEmpty())
+						{
+							plugin.setTyping(false);
+							clientThread.invoke(plugin::lockChat);
+						}
 					}
 					break;
 			}

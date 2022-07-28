@@ -67,6 +67,9 @@ public class ShiftRemappingPlugin extends Plugin
 	private KeyManager keyManager;
 
 	@Inject
+	private ShiftRemappingConfig config;
+
+	@Inject
 	private ShiftRemappingListener inputListener;
 
 	@Getter(AccessLevel.PACKAGE)
@@ -76,12 +79,13 @@ public class ShiftRemappingPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		typing = false;
+		typing = !config.enterToChat();
 		keyManager.registerKeyListener(inputListener);
 
 		clientThread.invoke(() ->
 		{
-			if (client.getGameState() == GameState.LOGGED_IN)
+			if (client.getGameState() == GameState.LOGGED_IN
+				&& config.enterToChat())
 			{
 				lockChat();
 				// Clear any typed text
@@ -153,13 +157,13 @@ public class ShiftRemappingPlugin extends Plugin
 		{
 			case "setChatboxInput":
 				Widget chatboxInput = client.getWidget(WidgetInfo.CHATBOX_INPUT);
-				if (chatboxInput != null && !typing)
+				if (chatboxInput != null && !typing && config.enterToChat())
 				{
 					setChatboxWidgetInput(chatboxInput, PRESS_ENTER_TO_CHAT);
 				}
 				break;
 			case "blockChatInput":
-				if (!typing)
+				if (!typing && config.enterToChat())
 				{
 					int[] intStack = client.getIntStack();
 					int intStackSize = client.getIntStackSize();
@@ -172,7 +176,7 @@ public class ShiftRemappingPlugin extends Plugin
 	void lockChat()
 	{
 		Widget chatboxInput = client.getWidget(WidgetInfo.CHATBOX_INPUT);
-		if (chatboxInput != null)
+		if (chatboxInput != null && config.enterToChat())
 		{
 			setChatboxWidgetInput(chatboxInput, PRESS_ENTER_TO_CHAT);
 		}

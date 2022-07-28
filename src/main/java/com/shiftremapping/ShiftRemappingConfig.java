@@ -44,4 +44,14 @@ public interface ShiftRemappingConfig extends Config
 	{
 		return new ModifierlessKeybind(KeyEvent.VK_UNDEFINED, InputEvent.SHIFT_DOWN_MASK);
 	}
+	@ConfigItem(
+			position = 1,
+			keyName = "enterToChat",
+			name = "EnterToChat",
+			description = "Enables pressing Enter to chat."
+	)
+	default boolean enterToChat()
+	{
+		return true;
+	}
 }
