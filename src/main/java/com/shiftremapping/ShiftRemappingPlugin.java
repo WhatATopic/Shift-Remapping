@@ -37,8 +37,8 @@ import net.runelite.api.VarClientInt;
 import net.runelite.api.VarClientStr;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -116,7 +116,7 @@ public class ShiftRemappingPlugin extends Plugin
 
 	boolean chatboxFocused()
 	{
-		Widget chatboxParent = client.getWidget(WidgetInfo.CHATBOX_PARENT);
+		Widget chatboxParent = client.getWidget(ComponentID.CHATBOX_PARENT);
 		if (chatboxParent == null || chatboxParent.getOnKeyListener() == null)
 		{
 			return false;
@@ -124,12 +124,20 @@ public class ShiftRemappingPlugin extends Plugin
 
 		// the search box on the world map can be focused, and chat input goes there, even
 		// though the chatbox still has its key listener.
-		//Included check to make sure options chat menu isn't open and make sure bank pin menu isn't open
-		Widget worldMapSearch = client.getWidget(WidgetInfo.WORLD_MAP_SEARCH);
-		boolean isMapSearchClosed = worldMapSearch == null || client.getVarcIntValue(VarClientInt.WORLD_MAP_SEARCH_FOCUSED) != 1;
-		boolean isInterfaceClosed = !config.disableIfMenuOpen() || (!isOptionsDialogOpen() && isHidden(WidgetInfo.BANK_PIN_CONTAINER));
 
-		return isMapSearchClosed && isInterfaceClosed;
+		Widget worldMapSearch = client.getWidget(ComponentID.WORLD_MAP_SEARCH);
+		if (worldMapSearch != null && client.getVarcIntValue(VarClientInt.WORLD_MAP_SEARCH_FOCUSED) == 1)
+		{
+			return false;
+		}
+
+		//Included check to make sure options chat menu isn't open and make sure bank pin menu isn't open
+		if (config.disableIfMenuOpen() && (isOptionsDialogOpen() || !isHidden(ComponentID.BANK_PIN_CONTAINER)))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	boolean isDialogOpen()
@@ -137,20 +145,20 @@ public class ShiftRemappingPlugin extends Plugin
 		// Most chat dialogs with numerical input are added without the chatbox or its key listener being removed,
 		// so chatboxFocused() is true. The chatbox onkey script uses the following logic to ignore key presses,
 		// so we will use it too to not remap F-keys.
-		return isHidden(WidgetInfo.CHATBOX_MESSAGES) || isHidden(WidgetInfo.CHATBOX_TRANSPARENT_LINES)
-			// We want to block F-key remapping in the bank pin interface too, so it does not interfere with the
-			// Keyboard Bankpin feature of the Bank plugin
-			|| !isHidden(WidgetInfo.BANK_PIN_CONTAINER);
+		return isHidden(ComponentID.CHATBOX_MESSAGES) || isHidden(ComponentID.CHATBOX_TRANSPARENT_BACKGROUND_LINES)
+				// We want to block F-key remapping in the bank pin interface too, so it does not interfere with the
+				// Keyboard Bankpin feature of the Bank plugin
+				|| !isHidden(ComponentID.BANK_PIN_CONTAINER);
 	}
 
 	boolean isOptionsDialogOpen()
 	{
-		return client.getWidget(WidgetInfo.DIALOG_OPTION) != null;
+		return client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS) != null;
 	}
 
-	private boolean isHidden(WidgetInfo widgetInfo)
+	private boolean isHidden(int component)
 	{
-		Widget w = client.getWidget(widgetInfo);
+		Widget w = client.getWidget(component);
 		return w == null || w.isSelfHidden();
 	}
 
@@ -160,7 +168,7 @@ public class ShiftRemappingPlugin extends Plugin
 		switch (scriptCallbackEvent.getEventName())
 		{
 			case "setChatboxInput":
-				Widget chatboxInput = client.getWidget(WidgetInfo.CHATBOX_INPUT);
+				Widget chatboxInput = client.getWidget(ComponentID.CHATBOX_INPUT);
 				if (chatboxInput != null && !typing && config.enterToChat())
 				{
 					setChatboxWidgetInput(chatboxInput, PRESS_ENTER_TO_CHAT);
@@ -179,7 +187,7 @@ public class ShiftRemappingPlugin extends Plugin
 
 	void lockChat()
 	{
-		Widget chatboxInput = client.getWidget(WidgetInfo.CHATBOX_INPUT);
+		Widget chatboxInput = client.getWidget(ComponentID.CHATBOX_INPUT);
 		if (chatboxInput != null && config.enterToChat())
 		{
 			setChatboxWidgetInput(chatboxInput, PRESS_ENTER_TO_CHAT);
@@ -188,7 +196,7 @@ public class ShiftRemappingPlugin extends Plugin
 
 	void unlockChat()
 	{
-		Widget chatboxInput = client.getWidget(WidgetInfo.CHATBOX_INPUT);
+		Widget chatboxInput = client.getWidget(ComponentID.CHATBOX_INPUT);
 		if (chatboxInput != null)
 		{
 			if (client.getGameState() == GameState.LOGGED_IN)
