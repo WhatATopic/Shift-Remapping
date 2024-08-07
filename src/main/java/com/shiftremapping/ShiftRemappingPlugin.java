@@ -124,8 +124,12 @@ public class ShiftRemappingPlugin extends Plugin
 
 		// the search box on the world map can be focused, and chat input goes there, even
 		// though the chatbox still has its key listener.
+		//Included check to make sure options chat menu isn't open and make sure bank pin menu isn't open
 		Widget worldMapSearch = client.getWidget(WidgetInfo.WORLD_MAP_SEARCH);
-		return worldMapSearch == null || client.getVarcIntValue(VarClientInt.WORLD_MAP_SEARCH_FOCUSED) != 1;
+		boolean isMapSearchClosed = worldMapSearch == null || client.getVarcIntValue(VarClientInt.WORLD_MAP_SEARCH_FOCUSED) != 1;
+		boolean isInterfaceClosed = !config.disableIfMenuOpen() || (!isOptionsDialogOpen() && isHidden(WidgetInfo.BANK_PIN_CONTAINER));
+
+		return isMapSearchClosed && isInterfaceClosed;
 	}
 
 	boolean isDialogOpen()

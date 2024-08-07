@@ -38,7 +38,7 @@ public interface ShiftRemappingConfig extends Config
 		position = 0,
 		keyName = "shift",
 		name = "Shift",
-		description = "The key which will replace {Shift}."
+		description = "The key which will replace Shift."
 	)
 	default ModifierlessKeybind shift()
 	{
@@ -47,10 +47,20 @@ public interface ShiftRemappingConfig extends Config
 	@ConfigItem(
 			position = 1,
 			keyName = "enterToChat",
-			name = "EnterToChat",
+			name = "Enter to chat",
 			description = "Enables pressing Enter to chat."
 	)
 	default boolean enterToChat()
+	{
+		return true;
+	}
+	@ConfigItem(
+			position = 2,
+			keyName = "disableIfMenuOpen",
+			name = "Disable if menu open",
+			description = "Disables shift remap if dialog options or bank pin interface is open."
+	)
+	default boolean disableIfMenuOpen()
 	{
 		return true;
 	}
