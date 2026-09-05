@@ -64,4 +64,14 @@ public interface ShiftRemappingConfig extends Config
 	{
 		return true;
 	}
+	@ConfigItem(
+			position = 2,
+			keyName = "consumeRemappedKeyInputs",
+			name = "Consume remapped key inputs",
+			description = "Consumes the key press events for the remapped key."
+	)
+	default boolean consumeRemappedKeyInputs()
+	{
+		return true;
+	}
 }

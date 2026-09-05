@@ -31,8 +31,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
+
+import com.google.common.base.Strings;
 import net.runelite.api.Client;
-import net.runelite.api.VarClientStr;
+import net.runelite.api.gameval.VarClientID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.input.KeyListener;
 
@@ -87,7 +89,7 @@ class ShiftRemappingListener implements KeyListener
 				e.setKeyCode(mappedKeyCode);
 				// arrow keys and fkeys do not have a character
 				e.setKeyChar(KeyEvent.CHAR_UNDEFINED);
-				if (keyChar != KeyEvent.CHAR_UNDEFINED)
+				if (keyChar != KeyEvent.CHAR_UNDEFINED && config.consumeRemappedKeyInputs())
 				{
 					// If this key event has a valid key char then a key typed event may be received next,
 					// we must block it
@@ -122,7 +124,7 @@ class ShiftRemappingListener implements KeyListener
 						plugin.setTyping(false);
 						clientThread.invoke(() ->
 						{
-							client.setVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT, "");
+							client.setVarcStrValue(VarClientID.CHATINPUT, "");
 							plugin.lockChat();
 						});
 					}
@@ -138,8 +140,7 @@ class ShiftRemappingListener implements KeyListener
 					if (config.enterToChat())
 					{
 						// Only lock chat on backspace when the typed text is now empty
-						if (client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT) == null ||
-								client.getVarcStrValue(VarClientStr.CHATBOX_TYPED_TEXT).isEmpty())
+						if (Strings.isNullOrEmpty(client.getVarcStrValue(VarClientID.CHATINPUT)))
 						{
 							plugin.setTyping(false);
 							clientThread.invoke(plugin::lockChat);
